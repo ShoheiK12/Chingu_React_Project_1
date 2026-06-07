@@ -1,16 +1,39 @@
 // cd energy-dashboard -> npm run dev
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EnergyChart from "./components/EnergyChart";
+import "./App.css";
 
 export default function App() {
   const [data, setData] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [filter, setFilter] = useState("all");
 
   const [form, setForm] = useState({
     date: "",
     usage: ""
   });
+  
+  
+  // Load saved data from localStorage and convert it from a JSON string to an array
+  useEffect(() => {
+    const saved = localStorage.getItem("energyData");
+    if (saved) setData(JSON.parse(saved));
+    setIsLoaded(true);
+  }, []);
+
+  // Convert the data array to a JSON string and save it to localStorage
+  // Save data if isLoaded is true.
+  useEffect(() => {
+    // Do not save before loading data. -> If save before loading, always data = [].
+    if (!isLoaded) return;
+    console.log("Saving data:", data);
+
+    localStorage.setItem(
+      "energyData",
+      JSON.stringify(data)
+    );
+  }, [data, isLoaded]);
 
   // Change Input
   const handleChange = (e) => {
@@ -81,57 +104,67 @@ export default function App() {
   };
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Energy Dashboard</h1>
+    <div className="container">
+      <h1 className="title">Energy Dashboard</h1>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="date"
-          name="date"
-          value={form.date}
-          onChange={handleChange}
-        />
-
-        <input
-          type="number"
-          name="usage"
-          value={form.usage}
-          onChange={handleChange}
-        />
+      <form className="form" onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Date</label>
+          <input
+            type="date"
+            name="date"
+            value={form.date}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="form-group">
+          <label>Usage (kWh)</label>
+          <input
+            type="number"
+            name="usage"
+            value={form.usage}
+            onChange={handleChange}
+          />
+        </div>
 
         <button type="submit">Add</button>
       </form>
 
       <hr />
 
-      <div style={{ margin: "10px 0" }}>
+      <div className="filter">
         <button onClick={() => setFilter("all")}>All</button>
         <button onClick={() => setFilter("week")}>Week</button>
         <button onClick={() => setFilter("month")}>Month</button>
       </div>
+      
+      <div className="chart">
+        <EnergyChart data={getFilteredData()} />
+      </div>
 
-      <EnergyChart data={getFilteredData()} />
+      <h2 className="subtitle">Records</h2>
 
-      <h2>Records</h2>
+      <div className="records">
+        {data.length === 0 ? (
+          <p>No data yet</p>
+        ) : (
+          <ul>
+            {data.map((item) => (
+              <li className="record-item" key={item.id}>
+                {item.date} → {item.usage} kWh
 
-      {data.length === 0 ? (
-        <p>No data yet</p>
-      ) : (
-        <ul>
-          {data.map((item) => (
-            <li key={item.id}>
-              {item.date} → {item.usage} kWh
-
-              <button
-                onClick={() => handleDelete(item.id)}
-                style={{ marginLeft: "10px", color: "red" }}
-              >
-              Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+                <button
+                  className="delete-btn"
+                  onClick={() => handleDelete(item.id)}
+                  style={{ marginLeft: "10px", color: "red" }}
+                >
+                Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}  
+      </div>
     </div>
   );
 }
