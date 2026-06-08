@@ -9,6 +9,7 @@ export default function App() {
   const [data, setData] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [error, setError] = useState("");
 
   const [form, setForm] = useState({
     date: "",
@@ -50,7 +51,19 @@ export default function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!form.date || !form.usage) return;
+    // Validation
+    if (!form.date || !form.usage) {
+      setError("Please enter both date and usage.");
+      return;
+    }
+    
+    if (Number(form.usage) <= 0) {
+      setError("Usage must be greater than 0.");
+      return;
+    }
+
+    // Delete error if success.
+    setError("");
 
     setData((prev) => {
       // Find if the same data already exists
@@ -130,6 +143,7 @@ export default function App() {
             name="date"
             value={form.date}
             onChange={handleChange}
+            className={error && !form.date ? "input-error" : ""}
           />
         </div>
         <div className="form-group">
@@ -139,11 +153,18 @@ export default function App() {
             name="usage"
             value={form.usage}
             onChange={handleChange}
+            className={error && !form.date ? "input-error" : ""}
           />
         </div>
 
         <button type="submit">Add</button>
       </form>
+      
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
 
       <hr />
 

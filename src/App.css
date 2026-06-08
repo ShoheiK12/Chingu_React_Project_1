@@ -154,3 +154,17 @@ button:hover {
   font-weight: 700;
   color: #111;
 }
+
+.error-message {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 10px 0;
+  border: 1px solid #fecaca;
+  font-size: 14px;
+}
+
+.input-error {
+  border: 1px solid #ef4444;
+}
