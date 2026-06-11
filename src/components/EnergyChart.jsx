@@ -11,7 +11,7 @@ import {
 
 import { Line } from "react-chartjs-2";
 
-// Chart.js登録（必須）
+// Chart.js register
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -23,45 +23,80 @@ ChartJS.register(
 );
 
 export default function EnergyChart({ data }) {
-  // データが空なら何も表示しない
+  // if data is empty, no display
   if (!data || data.length === 0) {
     return <p>No data to display</p>;
   }
 
-  // Chart.js用に整形
+  // Transform data for Chart.js
   const chartData = {
     labels: data.map((item) => item.date),
     datasets: [
       {
         label: "Energy Usage (kWh)",
         data: data.map((item) => item.usage),
-        borderColor: "blue",
-        backgroundColor: "rgba(0,0,255,0.2)",
-        tension: 0.3, // 曲線のなめらかさ
+        borderColor: "#3b82f6",
+        backgroundColor: "rgba(59,130,246,0.2)",
+        tension: 0.3, 
       },
     ],
   };
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
+    
     plugins: {
       legend: {
         position: "top",
+        labels: {
+          boxWidth: 12,
+          usePointStyle: true,
+          pointStyle: "circle",
+        },
       },
+
       title: {
         display: true,
         text: "Energy Consumption Overview",
+        font: {
+          size: 16,
+          weight: "600",
+        },
+      },
+
+      tooltip: {
+        mode: "index",
+        intersect: false,
       },
     },
+
+    interaction: {
+      mode: "index",
+      intersect: false,
+    },
+
     scales: {
+      x: {
+        grid: {
+          display: false, 
+        },
+      },
+
       y: {
         beginAtZero: true,
+        grid: {
+          color: "rgba(0,0,0,0.05)", 
+        },
+        ticks: {
+          beginAtZero: true 
+        },
       },
     },
   };
 
   return (
-    <div style={{ marginTop: "20px" }}>
+    <div style={{ width: "100%", height: "300px", marginTop: "20px" }}>
       <Line data={chartData} options={options} />
     </div>
   );

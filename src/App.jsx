@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import EnergyChart from "./components/EnergyChart";
 import KPIcards from "./components/KPIcards";
+import Toast from "./components/Toast";
 import "./App.css";
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [filter, setFilter] = useState("all");
   const [error, setError] = useState("");
+  const [toast, setToast] = useState("");
 
   const [form, setForm] = useState({
     date: "",
@@ -88,6 +90,8 @@ export default function App() {
         }
       ];
     });
+    
+    setToast("Energy data saved successfully!");
 
     setForm({ date: "", usage: "" });
   };
@@ -97,6 +101,7 @@ export default function App() {
   // Keep the data that does not match the data that you want to delete.
   const handleDelete = (id) => {
     setData((prev) => prev.filter((item) => item.id !== id));
+    setToast("Record deleted!");
   };
   
   // Filtering
@@ -130,79 +135,94 @@ export default function App() {
       return new Date(a.date) - new Date(b.date);
     });
   };
+  
+  useEffect(() => {
+    if (!toast) return;
+
+    const timer = setTimeout(() => {
+      setToast("");
+    }, 3000);
+
+    return () => clearTimeout(timer);
+
+  }, [toast]);
 
   return (
-    <div className="container">
-      <h1 className="title">Energy Dashboard</h1>
-
-      <form className="form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Date</label>
-          <input
-            type="date"
-            name="date"
-            value={form.date}
-            onChange={handleChange}
-            className={error && !form.date ? "input-error" : ""}
-          />
-        </div>
-        <div className="form-group">
-          <label>Usage (kWh)</label>
-          <input
-            type="number"
-            name="usage"
-            value={form.usage}
-            onChange={handleChange}
-            className={error && !form.date ? "input-error" : ""}
-          />
-        </div>
-
-        <button type="submit">Add</button>
-      </form>
+    <>
+      <Toast message={toast} />
       
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
+      <div className="container">
+        <h1 className="title">Energy Dashboard</h1>
 
-      <hr />
+        <form className="form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Date</label>
+            <input
+              type="date"
+              name="date"
+              value={form.date}
+              onChange={handleChange}
+              className={error && !form.usage ? "input-error" : ""}
+            />
+          </div>
+          <div className="form-group">
+            <label>Usage (kWh)</label>
+            <input
+              type="number"
+              name="usage"
+              value={form.usage}
+              onChange={handleChange}
+              className={error && !form.usage ? "input-error" : ""}
+            />
+          </div>
 
-      <div className="filter">
-        <button onClick={() => setFilter("all")}>All</button>
-        <button onClick={() => setFilter("week")}>Week</button>
-        <button onClick={() => setFilter("month")}>Month</button>
-      </div>
+          <button type="submit">Add</button>
+        </form>
       
-      <KPIcards data={data} />
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
 
-      <div className="chart card">
-        <EnergyChart data={getFilteredData()} />
+        <hr />
+
+        <div className="filter">
+          <button onClick={() => setFilter("all")}>All</button>
+          <button onClick={() => setFilter("week")}>Week</button>
+          <button onClick={() => setFilter("month")}>Month</button>
+        </div>
+      
+        <KPIcards data={data} />
+
+        <div className="chart card">
+          <EnergyChart data={getFilteredData()} />
+        </div>
+
+        <h2 className="subtitle">Records</h2>
+
+        <div className="records">
+          {data.length === 0 ? (
+            <p>No data yet</p>
+          ) : (
+            <ul>
+              {data.map((item) => (
+                <li className="record-item" key={item.id}>
+                  {item.date} → {item.usage} kWh
+
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(item.id)}
+                  >
+                  Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}  
+        </div>
       </div>
-
-      <h2 className="subtitle">Records</h2>
-
-      <div className="records">
-        {data.length === 0 ? (
-          <p>No data yet</p>
-        ) : (
-          <ul>
-            {data.map((item) => (
-              <li className="record-item" key={item.id}>
-                {item.date} → {item.usage} kWh
-
-                <button
-                  className="delete-btn"
-                  onClick={() => handleDelete(item.id)}
-                >
-                Delete
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}  
-      </div>
-    </div>
+    </>
   );
 }
 
