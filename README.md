@@ -1,5 +1,8 @@
 # Energy Dashboard
 
+## Live Demo
+🔗 https://energy-dashboard-five-mu.vercel.app/
+
 ## Overview
 
 Energy Dashboard is a responsive web application that allows users to track and visualize their daily energy consumption.
