@@ -48,7 +48,7 @@ Users can add, update, and delete energy records, view consumption trends throug
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Energy_Dashboard.git
+git clone https://github.com/ShoheiK12/Energy_Dashboard.git
 ```
 
 2. Navigate to the project folder:
